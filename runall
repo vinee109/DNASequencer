@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Usage: ./runall <command to run your program>
-# For instance, if your program can be run with 'python code/assemble.py',
-# you could run ./runall python code/assemble.py
+# For instance, if your program can be run with 'python assemble.py',
+# you could run ./runall python assemble.py
 
 for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 do
