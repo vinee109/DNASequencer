@@ -70,7 +70,7 @@ class BinaryHeap():
 
 	def removeMax(self):
 		"""
-		Removes the minimum item in the heap
+		Removes the maximum item in the heap
 		>>> heap = BinaryHeap(5)
 		>>> heap.insert(10)
 		>>> heap.insert(5)
