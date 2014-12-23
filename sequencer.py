@@ -1,7 +1,15 @@
-import struct
+import heapq
 
 def sequence(reads):
 	reads = remove_substrings(reads)
+	while len(reads) > 1:
+		overlaps = pair_overlap(reads)
+		i, j, length = heapq.nlargest(1, overlaps, lambda x:x[2])[0]
+		u, v = reads[i], reads[j]
+		merged = u[:len(u)-length] + v
+		reads = reads[0:min(i, j)] + reads[min(i, j) + 1:max(i, j)] + reads[max(i, j)+1:]
+		reads.append(merged)
+	return reads[0]
 
 def overlap(u, v):
 	"""
@@ -20,11 +28,21 @@ def overlap(u, v):
 	return 0, ''
 
 def remove_substrings(reads):
-	lst = []
+	to_remove = set()
 	for i in range(len(reads)):
 		for j in range(len(reads)):
 			if i != j and reads[i] in reads[j]:
-				lst.append(reads[j])
-	return lst 
+				to_remove.add(i)
+	return [reads[i] for i in range(len(reads)) if i not in to_remove]
+
+def pair_overlap(reads):
+	lst = []
+	for i in range(len(reads)):
+		for j in range(len(reads)):
+			if i != j:
+				len_overlap = overlap(reads[i], reads[j])[0]
+				if len_overlap > 0:
+					lst.append((i, j, len_overlap))
+	return lst
 
 
