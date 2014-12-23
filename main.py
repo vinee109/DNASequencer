@@ -13,4 +13,4 @@ def get_input():
 
 if __name__ == '__main__':
 	reads = get_input()
-	print sequencer(reads)
+	print sequencer.sequence(reads)
