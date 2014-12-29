@@ -1,10 +1,11 @@
-import heapq
+import struct
 
 def sequence(reads):
 	reads = remove_substrings(reads)
 	while len(reads) > 1:
 		overlaps = pair_overlap(reads)
-		i, j, length = heapq.nlargest(1, overlaps, lambda x:x[2])[0]
+		heap = struct.MaxHeap(overlaps, key=lambda x:x[2])
+		i, j, length = heap.remove_max()
 		u, v = reads[i], reads[j]
 		merged = u[:len(u)-length] + v
 		reads = reads[0:min(i, j)] + reads[min(i, j) + 1:max(i, j)] + reads[max(i, j)+1:]

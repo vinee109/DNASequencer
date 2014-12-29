@@ -13,7 +13,7 @@ class Heap():
         n = len(lst) - 1
         # start at last parent and go left one node at a time
         for node in range(n/2, -1, -1):
-            __siftdown(lst, node)
+            self.__siftdown(node)
         return
 
     # runs in log(n) time
@@ -74,10 +74,10 @@ class Heap():
 class MaxHeap(Heap):
 
     def __init__(self, items, key=lambda x:x):
-        Heap.__init__(self)
+        Heap.__init__(self, items, key=key)
 
     def max(self):
         return self.items[0]
 
     def remove_max(self):
-        self.remove_top()
+        return self.remove_top()
