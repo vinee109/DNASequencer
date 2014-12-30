@@ -33,6 +33,9 @@ class Heap():
         max = self.items.pop(n)
         self.__siftdown(0)
         return max
+
+    def size(self):
+        return len(self.items)
         
     def __swap(self, lst, i, j):
         # the pythonic swap
