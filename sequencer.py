@@ -2,11 +2,23 @@ import struct
 THRESHOLD = 2
 
 def sequence(reads):
+	"""
+	Takes in a list of reads and generates the shortest superstring that contains all the reads as
+	substrings
+	"""
+	# removes all strings that are substrings of another read
 	reads = remove_substrings(reads)
+	# figure out all possible pairs of overlaps above a certain threshold
 	overlaps, right_overlap_map, left_overlap_map = pair_overlap(reads)
 	overlaps = sorted(overlaps, key=lambda x: x[2])
-	left_overlap, right_overlap = {}, {}
-	count = 0
+	
+	left_overlap = {}	# mapping of overlaps where the key is the string on the left and the value is the string on the right
+	right_overlap = {}	# mapping of overlaps where the key is the string on the right and the value is the string on the left
+
+	count = 0	# number of overlaps processed
+	# iterate through them from largest overlap to shortest overlap and create a mapping of all the largest overlaps
+	# between pairs of reads
+	# the loop stops when we either process all the overlaps or perform a merge for all of the reads
 	while len(overlaps) > 0 and count < len(reads):
 		u, v, length = overlaps.pop()
 		if u not in left_overlap and v not in right_overlap:
@@ -48,6 +60,9 @@ def overlap(u, v):
 	return 0, ''
 
 def remove_substrings(reads):
+	"""
+	Takes in a list of reads and removes any read that is a substring of any other read
+	"""
 	to_remove = set()
 	for i in range(len(reads)):
 		for j in range(len(reads)):
@@ -56,6 +71,10 @@ def remove_substrings(reads):
 	return [reads[i] for i in range(len(reads)) if i not in to_remove]
 
 def pair_overlap(reads):
+	"""
+	Calculates all the lengths of overlaps above a threshold and creates a mapping of all overlaps
+	Returns dictionaries for overlaps where the key is the string on the left and the key is the string on the right
+	"""
 	right_overlap_map = {}
 	left_overlap_map = {}
 	lst = []
