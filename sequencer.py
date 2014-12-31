@@ -1,16 +1,35 @@
 import struct
+THRESHOLD = 2
 
 def sequence(reads):
 	reads = remove_substrings(reads)
-	while len(reads) > 1:
-		overlaps = pair_overlap(reads)
-		heap = struct.MaxHeap(overlaps, key=lambda x:x[2])
-		i, j, length = heap.remove_max()
-		u, v = reads[i], reads[j]
-		merged = u[:len(u)-length] + v
-		reads = reads[0:min(i, j)] + reads[min(i, j) + 1:max(i, j)] + reads[max(i, j)+1:]
-		reads.append(merged)
-	return reads[0]
+	overlaps, right_overlap_map, left_overlap_map = pair_overlap(reads)
+	overlaps = sorted(overlaps, key=lambda x: x[2])
+	left_overlap, right_overlap = {}, {}
+	count = 0
+	while len(overlaps) > 0 and count < len(reads):
+		u, v, length = overlaps.pop()
+		if u not in left_overlap and v not in right_overlap:
+			left_overlap[u] = (v, length)
+			right_overlap[v] = (u, length)
+			count += 1
+	
+	# finding the left most point in the sequence
+	start = ''
+	for u in left_overlap:
+		if u not in right_overlap:
+			start = u
+	return generate_seq_from_overlaps(start, start, left_overlap)
+
+def generate_seq_from_overlaps(seq, u, left_overlap):
+	"""
+	Creates a sequence given a starting point and a set of overlap mappings where for every key u, the value v represents
+	an overlap of (u, v) of some length
+	"""
+	if u not in left_overlap:
+		return seq
+	v, length = left_overlap[u]
+	return generate_seq_from_overlaps(seq[:len(seq)-length] + v, v, left_overlap)
 
 def overlap(u, v):
 	"""
@@ -37,13 +56,21 @@ def remove_substrings(reads):
 	return [reads[i] for i in range(len(reads)) if i not in to_remove]
 
 def pair_overlap(reads):
+	right_overlap_map = {}
+	left_overlap_map = {}
 	lst = []
-	for i in range(len(reads)):
-		for j in range(len(reads)):
+	for i in reads:
+		for j in reads:
 			if i != j:
-				len_overlap = overlap(reads[i], reads[j])[0]
-				if len_overlap > 0:
+				len_overlap = overlap(i, j)[0]
+				if len_overlap >= THRESHOLD:
+					if i not in right_overlap_map:
+						right_overlap_map[i] = []
+					if j not in left_overlap_map:
+						left_overlap_map[j] = []
+					right_overlap_map[i] += [(j, len_overlap)]
+					left_overlap_map[j] += [(i, len_overlap)]
 					lst.append((i, j, len_overlap))
-	return lst
+	return lst, right_overlap_map, left_overlap_map
 
 
