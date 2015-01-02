@@ -1,4 +1,6 @@
 import struct
+import time
+from functools import wraps
 THRESHOLD = 2
 
 def sequence(reads):
@@ -43,21 +45,53 @@ def generate_seq_from_overlaps(seq, u, left_overlap):
 	v, length = left_overlap[u]
 	return generate_seq_from_overlaps(seq[:len(seq)-length] + v, v, left_overlap)
 
-def overlap(u, v):
-	"""
-	Calculates the largest overlap of u on the left and v on the right.
-	Returns a tuple containing the length of the overlap and the actual overlap
-	>>> overlap('abcd', 'bcdefgh')
-	(3, 'bcd')
-	>>> overlap('abcd', 'abcdefgh')
-	(4, 'abcd')
-	>>> overlap('abcd', 'dog')
-	(1, 'd')
-	"""
-	for i in range(min(len(u), len(v)), 0, -1):
-		if u[len(u)-i:] == v[:i]:
-			return i, v[:i]
-	return 0, ''
+# @profile
+# def overlap(u, v):
+# 	"""
+# 	Calculates the largest overlap of u on the left and v on the right.
+# 	Returns a tuple containing the length of the overlap and the actual overlap
+# 	>>> overlap('abcd', 'bcdefgh')
+# 	(3, 'bcd')
+# 	>>> overlap('abcd', 'abcdefgh')
+# 	(4, 'abcd')
+# 	>>> overlap('abcd', 'dog')
+# 	(1, 'd')
+# 	"""
+# 	for i in range(min(len(u), len(v)), 0, -1):
+# 		if u[len(u)-i:] == v[:i]:
+# 			return i, v[:i]
+# 	return 0, ''
+
+def overlap(text1, text2):
+  	# Cache the text lengths to prevent multiple calls.  
+  	text1_length = len(text1)  
+  	text2_length = len(text2)  
+  	# Eliminate the null case.  
+  	if text1_length == 0 or text2_length == 0:  
+		return 0  
+  	# Truncate the longer string.  
+  	if text1_length > text2_length:  
+		text1 = text1[-text2_length:]  
+  	elif text1_length < text2_length:  
+		text2 = text2[:text1_length]  
+  	# Quick check for the worst case.  
+  	if text1 == text2:  
+		length = min(text1_length, text2_length)  
+		return length, text2[:length]
+   
+	# Start by looking for a single character match  
+	# and increase length until no match is found.  
+	best = 0  
+	length = 1  
+	while True:  
+		pattern = text1[-length:]  
+		found = text2.find(pattern)  
+		if found == -1:  
+			return best, text2[:best]  
+		length += found  
+		if text1[-length:] == text2[:length]:  
+			best = length  
+			length += 1  
 
 def remove_substrings(reads):
 	"""
