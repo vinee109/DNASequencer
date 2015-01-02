@@ -1,7 +1,7 @@
 import struct
 import time
 from functools import wraps
-THRESHOLD = 2
+THRESHOLD = 5
 
 def sequence(reads):
 	"""
